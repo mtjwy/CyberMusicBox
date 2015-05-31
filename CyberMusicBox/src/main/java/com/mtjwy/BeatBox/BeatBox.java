@@ -10,7 +10,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiSystem;
@@ -24,7 +27,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class BeatBox {
 	JPanel mainPanel;
@@ -33,6 +38,18 @@ public class BeatBox {
 	Sequence sequence;
 	Track track;
 	JFrame theFrame;
+	
+	JList incomingList;//for incoming messages, user can SELECT a message from the list to load and play the attached beat pattern
+	JTextField userMessage;
+	int nextNum;
+	ObjectOutputStream out;
+	ObjectInputStream in;
+	Map<String, boolean[]> otherSeqsMap = new HashMap<String, boolean[]>();
+	Sequence mySequence = null;
+	String userName;
+	
+	String serverIP;
+	int serverPort;
 	
 	String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat",
 			"Open Hi-Hat", "Acoustic Snare", "Crash Cymbal", "Hand Clap",
@@ -44,6 +61,31 @@ public class BeatBox {
 	
 	public static void main(String[] args) {
 		new BeatBox().buildGUI();
+	}
+	
+	//set up networking I/O, and start the reader thread
+	public void startUp(String name) {
+		userName = name;
+		//open connection to the server
+		try {
+			Socket sock = new Socket(serverIP, serverPort);
+			out = new ObjectOutputStream(sock.getOutputStream());
+			in = new ObjectInputStream(sock.getInputStream());
+			Thread remote = new Thread(new RemoteReader()); //thread for read in coming mesg
+			remote.start();
+		} catch (Exception e) {
+			System.out.println("Couldn't connect");
+		}
+		setUpMidi();
+		buildGUI();
+	}
+	public class RemoteReader implements Runnable {
+		
+		public void run() {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 	
 	public void buildGUI() {
@@ -104,7 +146,7 @@ public class BeatBox {
 			mainPanel.add(c);
 		}
 		
-		setUpMidi();
+		
 		
 		theFrame.setBounds(50, 50, 300, 300);
 		theFrame.pack();
@@ -112,6 +154,9 @@ public class BeatBox {
 		
 	}
 	
+	/**
+	 * Get the Sequencer, make a Sequence, and make a Track
+	 */
 	public void setUpMidi() {
 		try {
 			sequencer = MidiSystem.getSequencer();
