@@ -55,8 +55,8 @@ public class BeatBox {
 	String userName;
 	Vector<String> listVector = new Vector<String>();
 	
-	String serverIP;
-	int serverPort;
+	String serverIP = "localhost";
+	int serverPort = 4040;
 	
 	String[] instrumentNames = {"Bass Drum", "Closed Hi-Hat",
 			"Open Hi-Hat", "Acoustic Snare", "Crash Cymbal", "Hand Clap",
