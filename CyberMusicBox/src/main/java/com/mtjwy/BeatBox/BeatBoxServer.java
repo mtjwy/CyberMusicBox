@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 
@@ -66,7 +67,16 @@ public class BeatBoxServer {
 	}
 	
 	public void tellEveryone(Object one, Object two) {
-		
+		Iterator<ObjectOutputStream> it = clientOutputStreams.iterator();
+		while (it.hasNext()) {
+			try {
+				ObjectOutputStream out = it.next();
+				out.writeObject(one);
+				out.writeObject(two);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 	
 	public static void main(String[] args) {
