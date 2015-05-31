@@ -4,8 +4,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+
+
 
 public class BeatBoxServer {
 	ArrayList<ObjectOutputStream> clientOutputStreams;
@@ -43,7 +47,22 @@ public class BeatBoxServer {
 	}
 	
 	public void go() {
-		
+		clientOutputStreams = new ArrayList<ObjectOutputStream>();
+		try {
+			ServerSocket serverSock = new ServerSocket(serverPort);
+			while (true) {
+				Socket clientSocket = serverSock.accept();
+				ObjectOutputStream out = new ObjectOutputStream(
+						clientSocket.getOutputStream());
+				clientOutputStreams.add(out);
+
+				Thread t = new Thread(new ClientHandler(clientSocket));
+				t.start();
+				System.out.println("got a connection");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	public void tellEveryone(Object one, Object two) {
