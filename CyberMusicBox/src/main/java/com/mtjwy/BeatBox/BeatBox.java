@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
@@ -44,7 +45,7 @@ public class BeatBox {
 	Track track;
 	JFrame theFrame;
 	
-	JList incomingList;//for incoming messages, user can SELECT a message from the list to load and play the attached beat pattern
+	JList<String> incomingList;//for incoming messages, user can SELECT a message from the list to load and play the attached beat pattern
 	JTextField userMessage;
 	int nextNum;
 	ObjectOutputStream out;
@@ -85,10 +86,25 @@ public class BeatBox {
 		setUpMidi();
 		buildGUI();
 	}
+	
 	public class RemoteReader implements Runnable {
-		
+		boolean[] checkboxState = null;
+		String nameToshow = null;
+		Object obj = null;
 		public void run() {
-			// TODO Auto-generated method stub
+			try {
+				while ((obj = in.readObject()) != null) {
+					System.out.println("got an object from server");
+					System.out.println(obj.getClass());
+					String nameToShow = (String) obj;
+					checkboxState = (boolean[]) in.readObject();
+					otherSeqsMap.put(nameToShow, checkboxState);
+					listVector.add(nameToShow);
+					incomingList.setListData(listVector);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			
 		}
 		
@@ -139,7 +155,7 @@ public class BeatBox {
         userMessage = new JTextField();
         buttonBox.add(userMessage);
         
-        incomingList = new JList();
+        incomingList = new JList<String>();
         incomingList.addListSelectionListener( new MyListSelectionListener());
         incomingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
@@ -348,7 +364,7 @@ public class BeatBox {
 			try {
 				FileOutputStream fileStream = new FileOutputStream(new File("Checkbox.ser"));
 				ObjectOutputStream os = new ObjectOutputStream(fileStream);
-				
+				os.writeObject(checkboxState);
 			} catch (Exception ex) {
 				
 				ex.printStackTrace();
@@ -406,6 +422,14 @@ public class BeatBox {
 		
 	}
 	private void changeSequence(boolean[] checkBoxState) { 
+		for (int i = 0; i < 256; i++) {
+			JCheckBox check = (JCheckBox) checkboxList.get(i);
+			if(checkBoxState[i]) {
+				check.setSelected(true);
+			} else {
+				check.setSelected(false);
+			}
+		}
 		
 	}
 	
