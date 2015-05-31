@@ -66,7 +66,7 @@ public class BeatBox {
 	int[]instrumentKeys = {35, 42, 46, 38, 49, 39, 50, 60, 70, 72, 64, 56, 58, 47, 67, 63};
 	
 	public static void main(String[] args) {
-		new BeatBox().buildGUI();
+		new BeatBox().startUp("mtjwy");
 	}
 	
 	//set up networking I/O, and start the reader thread
@@ -195,44 +195,7 @@ public class BeatBox {
 		}
 	}
 	
-	public class MyStartListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			buildTrackAndStart();
-		}
-		
-	}
 	
-	public class MyStopListener implements ActionListener {
-
-		public void actionPerformed(ActionEvent e) {
-			sequencer.stop();
-			
-		}
-		
-	}
-	
-	
-	public class MyUpTempoListener implements ActionListener {
-		
-		//scales the sequencer's tempo, adjust +3%
-		public void actionPerformed(ActionEvent e) {
-			float tempoFactor = sequencer.getTempoFactor();
-			sequencer.setTempoFactor((float)(tempoFactor * 1.03));
-			
-		}
-		
-	}
-	
-	public class MyDownTempoListener implements ActionListener {
-		////scales the sequencer's tempo, adjust -3%
-		public void actionPerformed(ActionEvent e) {
-			float tempoFactor = sequencer.getTempoFactor();
-			sequencer.setTempoFactor((float)(tempoFactor * 0.97));
-			
-		}
-		
-	}
 	
 	//turn checkbox state into MIDI events, and add them to the Track
 	public void buildTrackAndStart() {
@@ -296,7 +259,46 @@ public class BeatBox {
 		return event;
 	}
 	
-	//Serializing a pattern
+	public class MyStartListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			buildTrackAndStart();
+		}
+		
+	}
+	
+	public class MyStopListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			sequencer.stop();
+			
+		}
+		
+	}
+	
+	
+	public class MyUpTempoListener implements ActionListener {
+		
+		//scales the sequencer's tempo, adjust +3%
+		public void actionPerformed(ActionEvent e) {
+			float tempoFactor = sequencer.getTempoFactor();
+			sequencer.setTempoFactor((float)(tempoFactor * 1.03));
+			
+		}
+		
+	}
+	
+	public class MyDownTempoListener implements ActionListener {
+		////scales the sequencer's tempo, adjust -3%
+		public void actionPerformed(ActionEvent e) {
+			float tempoFactor = sequencer.getTempoFactor();
+			sequencer.setTempoFactor((float)(tempoFactor * 0.97));
+			
+		}
+		
+	}
+	
+	//Serializing the pattern and the message, and write them to the socket output stream
 	public class MySendListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -309,16 +311,21 @@ public class BeatBox {
 				}
 			}
 			
-			//serialize the boolean array
+			//serialize the boolean array and meessage
+			
 			try {
-				FileOutputStream fileStream = new FileOutputStream(new File("Checkbox.ser"));
-				ObjectOutputStream os = new ObjectOutputStream(fileStream);
-				os.writeObject(checkboxState);
+				//FileOutputStream fileStream = new FileOutputStream(new File("Checkbox.ser"));
+				//ObjectOutputStream os = new ObjectOutputStream(fileStream);
+				out.writeObject(userName + nextNum++ + ": " + userMessage.getText());
+				out.writeObject(checkboxState);
+				
 			} catch (Exception ex) {
+				System.out.println("Sorry. Could not send it to the server.");
 				ex.printStackTrace();
 			}
+			userMessage.setText("");
 			
-			System.out.println("successfully serialized");
+			System.out.println("successfully serialized and send to server");
 			
 		}
 		
