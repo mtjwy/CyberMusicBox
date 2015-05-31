@@ -122,15 +122,15 @@ public class BeatBox {
 		downTempo.addActionListener(new MyDownTempoListener());
 		buttonBox.add(downTempo);
 		
-		/*
-        JButton saveIt = new JButton("Serialize It");  
-        saveIt.addActionListener(new MySendListener());
-        buttonBox.add(saveIt);
-
+		
+        JButton savePattern = new JButton("Save Beat Pattern");  
+        savePattern.addActionListener(new MySaveListener());
+        buttonBox.add(savePattern);
+        
         JButton restore = new JButton("Restore");     
         restore.addActionListener(new MyReadInListener());
         buttonBox.add(restore);
-        */
+        
         
         JButton sendIt = new JButton("sendIt");
         sendIt.addActionListener(new MySendListener());
@@ -331,6 +331,35 @@ public class BeatBox {
 		
 	}
 	
+	public class MySaveListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			boolean[] checkboxState = new boolean[256];
+			
+			for (int i = 0; i < 256; i++) {
+				JCheckBox check = (JCheckBox) checkboxList.get(i);
+				if (check.isSelected()) {
+					checkboxState[i] = true;
+				}
+			}
+			
+			//serialize the boolean array 
+			
+			try {
+				FileOutputStream fileStream = new FileOutputStream(new File("Checkbox.ser"));
+				ObjectOutputStream os = new ObjectOutputStream(fileStream);
+				
+			} catch (Exception ex) {
+				
+				ex.printStackTrace();
+			}
+			
+			
+			System.out.println("successfully serialized and store pattern");
+			
+		}
+		
+	}
 	//Deserializing a pattern
 	public class MyReadInListener implements ActionListener {
 
@@ -352,8 +381,8 @@ public class BeatBox {
 					check.setSelected(false);
 				}
 			}
-			//sequencer.stop();
-			//buildTrackAndStart();
+			sequencer.stop();
+			buildTrackAndStart();
 			
 		}
 		
@@ -362,9 +391,21 @@ public class BeatBox {
 	public class MyListSelectionListener implements ListSelectionListener {
 
 		public void valueChanged(ListSelectionEvent e) {
-			// TODO Auto-generated method stub
+			if (!e.getValueIsAdjusting()) {
+				String selected = (String) incomingList.getSelectedValue();
+				if(selected != null) {
+					//now go to the map, and change the sequence
+					boolean[] selectedState = (boolean[]) otherSeqsMap.get(selected);
+					changeSequence(selectedState);
+					sequencer.stop();
+					buildTrackAndStart();
+				}
+			}
 			
 		}
+		
+	}
+	private void changeSequence(boolean[] checkBoxState) { 
 		
 	}
 	
