@@ -3,6 +3,8 @@ package com.mtjwy.BeatBox;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Label;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.sound.midi.MidiSystem;
@@ -48,15 +50,19 @@ public class BeatBox {
 		Box buttonBox = new Box(BoxLayout.Y_AXIS);
 		
 		JButton start = new JButton("Start");
+		start.addActionListener(new MyStartListener());
 		buttonBox.add(start);
 		
 		JButton stop = new JButton("Strop");
+		stop.addActionListener(new MyStopListener());
 		buttonBox.add(stop);
 		
 		JButton upTempo = new JButton("Tempo Up");
+		upTempo.addActionListener(new MyUpTempoListener());
 		buttonBox.add(upTempo);
 		
 		JButton downTempo = new JButton("Tempo Down");
+		downTempo.addActionListener(new MyDownTempoListener());
 		buttonBox.add(downTempo);
 		
 		Box nameBox = new Box(BoxLayout.Y_AXIS);
@@ -102,7 +108,44 @@ public class BeatBox {
 		}
 	}
 	
+	public class MyStartListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			//buildTrackAndStart();
+		}
+		
+	}
 	
+	public class MyStopListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			sequencer.stop();
+			
+		}
+		
+	}
+	
+	
+	public class MyUpTempoListener implements ActionListener {
+		
+		//scales the sequencer's tempo, adjust +3%
+		public void actionPerformed(ActionEvent e) {
+			float tempoFactor = sequencer.getTempoFactor();
+			sequencer.setTempoFactor((float)(tempoFactor * 1.03));
+			
+		}
+		
+	}
+	
+	public class MyDownTempoListener implements ActionListener {
+		////scales the sequencer's tempo, adjust -3%
+		public void actionPerformed(ActionEvent e) {
+			float tempoFactor = sequencer.getTempoFactor();
+			sequencer.setTempoFactor((float)(tempoFactor * 0.97));
+			
+		}
+		
+	}
 }
 
 
