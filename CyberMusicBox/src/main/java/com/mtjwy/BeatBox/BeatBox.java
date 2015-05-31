@@ -14,6 +14,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiSystem;
@@ -29,7 +30,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class BeatBox {
 	JPanel mainPanel;
@@ -47,6 +52,7 @@ public class BeatBox {
 	Map<String, boolean[]> otherSeqsMap = new HashMap<String, boolean[]>();
 	Sequence mySequence = null;
 	String userName;
+	Vector<String> listVector = new Vector<String>();
 	
 	String serverIP;
 	int serverPort;
@@ -88,6 +94,8 @@ public class BeatBox {
 		
 	}
 	
+	
+	
 	public void buildGUI() {
 		theFrame = new JFrame("Cyber BeatBox");
 		theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -114,7 +122,7 @@ public class BeatBox {
 		downTempo.addActionListener(new MyDownTempoListener());
 		buttonBox.add(downTempo);
 		
-
+		/*
         JButton saveIt = new JButton("Serialize It");  
         saveIt.addActionListener(new MySendListener());
         buttonBox.add(saveIt);
@@ -122,6 +130,24 @@ public class BeatBox {
         JButton restore = new JButton("Restore");     
         restore.addActionListener(new MyReadInListener());
         buttonBox.add(restore);
+        */
+        
+        JButton sendIt = new JButton("sendIt");
+        sendIt.addActionListener(new MySendListener());
+        buttonBox.add(sendIt);
+        
+        userMessage = new JTextField();
+        buttonBox.add(userMessage);
+        
+        incomingList = new JList();
+        incomingList.addListSelectionListener( new MyListSelectionListener());
+        incomingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        JScrollPane theList = new JScrollPane(incomingList);
+        buttonBox.add(theList);
+        incomingList.setListData(listVector);//no data to start with
+        
+        
 		
 		Box nameBox = new Box(BoxLayout.Y_AXIS);
 		for (int i = 0; i < 16; i++) {
@@ -321,6 +347,15 @@ public class BeatBox {
 			}
 			//sequencer.stop();
 			//buildTrackAndStart();
+			
+		}
+		
+	}
+	
+	public class MyListSelectionListener implements ListSelectionListener {
+
+		public void valueChanged(ListSelectionEvent e) {
+			// TODO Auto-generated method stub
 			
 		}
 		
